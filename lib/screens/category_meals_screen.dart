@@ -48,12 +48,6 @@ class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
     }
   }
 
-  void _removeMeal(String mealId) {
-    setState(() {
-      categoryMeals.removeWhere((meal)=>meal.id==mealId);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +66,6 @@ class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
               complexity: categoryMeals[index].complexity,
               duration: categoryMeals[index].duration,
               color: categoryColor,
-              removeItem: _removeMeal,
             );
           },
           itemCount: categoryMeals.length,
