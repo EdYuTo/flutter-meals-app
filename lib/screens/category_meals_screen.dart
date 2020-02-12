@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:meals_app/models/meal.dart';
 import 'package:meals_app/widgets/meal_item.dart';
 import '../dummy-data.dart';
 
-class CategoryMealsScreen extends StatelessWidget {
+class CategoryMealsScreen extends StatefulWidget{
+  static const routeName = '/category-meals';
+
+  @override
+  State<StatefulWidget> createState() {
+    return _CategoryMealsScreenState();
+  }
+}
+
+class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
   // Use this without ModalRoute
   //final String categoryId;
   //final String categoryTitle;
@@ -10,19 +20,38 @@ class CategoryMealsScreen extends StatelessWidget {
 
   //CategoryMealsScreen(this.categoryId, this.categoryTitle, this.categoryColor);
 
-  static const routeName = '/category-meals';
+  String categoryTitle;
+  List<Meal> categoryMeals;
+  Color categoryColor;
+  var _loadedInitData = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_loadedInitData == false) {
+      final routeArgs =
+      ModalRoute
+          .of(context)
+          .settings
+          .arguments as Map<String, Object>;
+      final categoryId = routeArgs['id'];
+      categoryTitle = routeArgs['title'];
+      categoryColor = routeArgs['color'];
+      categoryMeals = DUMMY_MEALS.where((meal) {
+        return meal.categories.contains(categoryId);
+      }).toList();
+      _loadedInitData = true;
+    }
+  }
+
+  void _removeMeal(String mealId) {
+    setState(() {
+      categoryMeals.removeWhere((meal)=>meal.id==mealId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final routeArgs =
-        ModalRoute.of(context).settings.arguments as Map<String, Object>;
-    final categoryId = routeArgs['id'];
-    final categoryTitle = routeArgs['title'];
-    final categoryColor = routeArgs['color'];
-    final categoryMeals = DUMMY_MEALS.where((meal) {
-      return meal.categories.contains(categoryId);
-    }).toList();
-
     return Scaffold(
       appBar: AppBar(
         title: Text(categoryTitle),
@@ -39,6 +68,7 @@ class CategoryMealsScreen extends StatelessWidget {
               complexity: categoryMeals[index].complexity,
               duration: categoryMeals[index].duration,
               color: categoryColor,
+              removeItem: _removeMeal,
             );
           },
           itemCount: categoryMeals.length,
